@@ -2778,7 +2778,7 @@ int security_get_user_sids(struct selinux_state *state,
 	*nel = 0;
 
 	if (!ss_initialized) // SEC_SELINUX_PORTING_COMMON Change to use RKP
-		goto out;
+		return 0;
 
 	mysids = kcalloc(maxnel, sizeof(*mysids), GFP_KERNEL);
 	if (!mysids)
