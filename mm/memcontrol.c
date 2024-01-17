@@ -90,6 +90,8 @@ bool cgroup_memory_noswap __read_mostly;
 #define cgroup_memory_noswap		1
 #endif
 
+int is_heimdall_enabled;
+
 #ifdef CONFIG_CGROUP_WRITEBACK
 static DECLARE_WAIT_QUEUE_HEAD(memcg_cgwb_frn_waitq);
 #endif
@@ -3610,10 +3612,16 @@ static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap)
 		if (swap)
 			val += memcg_page_state(memcg, MEMCG_SWAP);
 	} else {
-		if (!swap)
-			val = page_counter_read(&memcg->memory);
-		else
-			val = page_counter_read(&memcg->memsw);
+		if (is_heimdall_enabled) {
+			val = memcg_page_state(memcg, NR_ANON_MAPPED);
+			if (swap)
+				val += memcg_page_state(memcg, MEMCG_SWAP);
+		} else {
+			if (!swap)
+				val = page_counter_read(&memcg->memory);
+			else
+				val = page_counter_read(&memcg->memsw);
+		}
 	}
 	return val;
 }
@@ -4206,7 +4214,7 @@ static int mem_cgroup_swappiness_write(struct cgroup_subsys_state *css,
 {
 	struct mem_cgroup *memcg = mem_cgroup_from_css(css);
 
-	if (val > 100)
+	if (val > 200)
 		return -EINVAL;
 
 	if (css->parent)
