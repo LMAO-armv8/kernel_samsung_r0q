@@ -6,6 +6,8 @@
 obj-$(CONFIG_BT_HCIVHCI)	+= hci_vhci.o
 obj-$(CONFIG_BT_HCIUART)	+= hci_uart.o
 obj-$(CONFIG_BT_HCIBCM203X)	+= bcm203x.o
+obj-$(CONFIG_BT_BCM4389)	+= bcm4389.o
+obj-$(CONFIG_BT_BLUESLEEP)	+= bluesleep.o
 obj-$(CONFIG_BT_HCIBPA10X)	+= bpa10x.o
 obj-$(CONFIG_BT_HCIBFUSB)	+= bfusb.o
 obj-$(CONFIG_BT_HCIDTL1)	+= dtl1_cs.o
@@ -29,6 +31,12 @@ obj-$(CONFIG_BT_QCA)		+= btqca.o
 obj-$(CONFIG_BT_HCIUART_NOKIA)	+= hci_nokia.o
 
 obj-$(CONFIG_BT_HCIRSI)		+= btrsi.o
+
+obj-$(CONFIG_MSM_BT_POWER)	+= btpower.o
+
+bt_fm_slim-objs	:= btfm_slim.o btfm_slim_codec.o btfm_slim_slave.o
+
+obj-$(CONFIG_BTFM_SLIM)	+= bt_fm_slim.o
 
 btmrvl-y			:= btmrvl_main.o
 btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o

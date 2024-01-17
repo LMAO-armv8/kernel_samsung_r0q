@@ -730,10 +730,11 @@ int usb_gadget_disconnect(struct usb_gadget *gadget)
 	}
 
 	ret = gadget->ops->pullup(gadget, 0);
-	if (!ret) {
+	if (!ret)
 		gadget->connected = 0;
+
+	if (gadget->udc->driver)
 		gadget->udc->driver->disconnect(gadget);
-	}
 
 out:
 	trace_usb_gadget_disconnect(gadget, ret);
@@ -811,6 +812,19 @@ out:
 	return ret;
 }
 EXPORT_SYMBOL_GPL(usb_gadget_activate);
+
+#ifdef CONFIG_USB_FUNC_WAKEUP_SUPPORTED
+int usb_gadget_func_wakeup(struct usb_gadget *gadget, int interface_id)
+{
+	if (gadget->speed < USB_SPEED_SUPER)
+		return -EOPNOTSUPP;
+
+	if (!gadget->ops->func_wakeup)
+		return -EOPNOTSUPP;
+
+	return gadget->ops->func_wakeup(gadget, interface_id);
+}
+#endif
 
 /* ------------------------------------------------------------------------- */
 
@@ -1494,7 +1508,7 @@ static int udc_bind_to_driver(struct usb_udc *udc, struct usb_gadget_driver *dri
 {
 	int ret;
 
-	dev_dbg(&udc->dev, "registering UDC driver [%s]\n",
+	dev_err(&udc->dev, "registering UDC driver [%s]\n",
 			driver->function);
 
 	udc->driver = driver;
@@ -1503,10 +1517,15 @@ static int udc_bind_to_driver(struct usb_udc *udc, struct usb_gadget_driver *dri
 	usb_gadget_udc_set_speed(udc, driver->max_speed);
 
 	ret = driver->bind(udc->gadget, driver);
-	if (ret)
+	if (ret) {
+		dev_err(&udc->dev, "driver->bind fail - ret: %d\n",
+			ret);
 		goto err1;
+	}
 	ret = usb_gadget_udc_start(udc);
 	if (ret) {
+		dev_err(&udc->dev, "usb_gadget_udc_start - ret: %d\n",
+			ret);
 		driver->unbind(udc->gadget);
 		goto err1;
 	}

@@ -15,6 +15,11 @@
 #include <linux/kdev_t.h>
 #include <linux/usb/ch9.h>
 
+#undef dev_dbg
+#define dev_dbg dev_info
+#undef pr_debug
+#define pr_debug pr_info
+
 #ifdef CONFIG_USB_CONFIGFS_F_ACC
 extern int acc_ctrlrequest_composite(struct usb_composite_dev *cdev,
 				const struct usb_ctrlrequest *ctrl);
@@ -461,6 +466,12 @@ static int config_usb_cfg_link(
 	 * from another gadget or a random directory.
 	 * Also a function instance can only be linked once.
 	 */
+
+	if (gi->composite.gadget_driver.udc_name) {
+		ret = -EINVAL;
+		goto out;
+	}
+
 	list_for_each_entry(a_fi, &gi->available_func, cfs_list) {
 		if (a_fi == fi)
 			break;
@@ -1296,6 +1307,8 @@ static void purge_configs_funcs(struct gadget_info *gi)
 		list_for_each_entry_safe_reverse(f, tmp, &c->functions, list) {
 
 			list_move(&f->list, &cfg->func_list);
+			if (f->disable)
+				f->disable(f);
 			if (f->unbind) {
 				dev_dbg(&gi->cdev.gadget->dev,
 					"unbind function '%s'/%p\n",

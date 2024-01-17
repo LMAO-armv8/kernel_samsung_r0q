@@ -50,6 +50,17 @@ config SCSI_UFSHCD
 	  However, do not compile this as a module if your root file system
 	  (the one containing the directory /) is located on a UFS device.
 
+config UFS_DBG
+	bool "Universal Flash Storage Debug Mode"
+	depends on SCSI_UFSHCD
+	help
+	This selects the debug mode for ufs vendor driver.
+	  Enables tracing for QTI ufs driver.
+	  This also enables ftrace for ufs core and SCSI.
+	  Enabling this would have an adverse performance impact on disk IO.
+
+	  If unsure, say N.
+
 config SCSI_UFSHCD_PCI
 	tristate "PCI bus based UFS Controller support"
 	depends on SCSI_UFSHCD && PCI
@@ -184,6 +195,14 @@ config SCSI_UFS_CRYPTO
 	  capabilities of the UFS device (if present) to perform crypto
 	  operations on data being transferred to/from the device.
 
+config SCSI_UFS_CRYPTO_QTI
+	tristate "Vendor specific UFS Crypto Engine Support"
+	depends on SCSI_UFS_CRYPTO
+	help
+	 Enable Vendor Crypto Engine Support in UFS
+	 Enabling this allows kernel to use UFS crypto operations defined
+	 and implemented by QTI.
+
 config SCSI_UFS_HPB
 	bool "Support UFS Host Performance Booster"
 	depends on SCSI_UFSHCD
@@ -192,3 +211,28 @@ config SCSI_UFS_HPB
 	  L2P (logical to physical) map of UFS to host DRAM. The driver uses HPB
 	  read command by piggybacking physical page number for bypassing FTL (flash
 	  translation layer)'s L2P address translation.
+
+config SEC_UFS_FEATURE
+	bool "SEC specific UFS feature"
+	depends on SCSI_UFSHCD && SCSI_UFS_QCOM
+	help
+	 Enable Samsung feature support
+	 Enabling this allows kernel to use SEC specific feature
+	 defined and implemented by SEC.
+
+config SCSI_UFS_TEST_MODE
+	bool "Samsung UFS TEST feature"
+	depends on SEC_UFS_FEATURE
+	help
+	 This selects support for test mode for debugging.
+	 Select this option if this feature is needed on working.
+
+	 If unsure, say N.
+
+config UFS_DATA_LOG
+	bool "Samsung UFS DATA logging"
+	depends on SEC_UFS_FEATURE
+	help
+	  This feature support for UFS Data logging.
+	  Select this option if this feature is needed on working.
+
