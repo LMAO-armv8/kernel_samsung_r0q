@@ -40,6 +40,7 @@
  *
  * Represents a heap of memory from which buffers can be made.
  */
+#include <linux/vmalloc.h>
 struct dma_heap {
 	const char *name;
 	const struct dma_heap_ops *ops;

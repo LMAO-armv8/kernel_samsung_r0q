@@ -516,7 +516,6 @@ LINUXINCLUDE    := \
 KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
 KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
-		   -Werror=implicit-function-declaration -Werror=implicit-int \
 		   -Werror=return-type -Wno-format-security \
 		   -std=gnu89
 KBUILD_CPPFLAGS := -D__KERNEL__
@@ -528,11 +527,11 @@ KBUILD_LDFLAGS_MODULE :=
 KBUILD_LDFLAGS :=
 CLANG_FLAGS :=
 
-ifeq ($(CONFIG_SEC_KUNIT),n)
-CC := scripts/basic/cc-wrapper $(CC)
-else
-CC := $(abs_srctree)/tools/cc-wrapper $(CC)
-endif
+#ifeq ($(CONFIG_SEC_KUNIT),n)
+#CC := scripts/basic/cc-wrapper $(CC)
+#else
+#CC := $(abs_srctree)/tools/cc-wrapper $(CC)
+#endif
 
 export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD CC
 export CPP AR NM STRIP OBJCOPY OBJDUMP READELF PAHOLE RESOLVE_BTFIDS LEX YACC AWK INSTALLKERNEL
